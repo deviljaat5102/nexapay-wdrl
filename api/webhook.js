@@ -18,13 +18,13 @@ function extractUserName(message) {
     return [u.first_name, u.last_name].filter(Boolean).join(" ") || "Hidden User";
   }
   const sourceText = message.caption || message.text || "";
-  const match = sourceText.match(/(?:user|name)\\s*[:：-]\\s*([^\\n]+)/i);
+  const match = sourceText.match(/(?:user|name)\s*[:：-]\s*([^\n]+)/i);
   return match?.[1]?.trim() || "Hidden User";
 }
 
 function extractAmount(message) {
   const sourceText = message.caption || message.text || "";
-  const match = sourceText.match(/(?:₹|rs\\.?\\s*)([0-9,]+(?:\\.[0-9]{1,2})?)/i);
+  const match = sourceText.match(/(?:₹|rs\.?\s*)([0-9,]+(?:\.[0-9]{1,2})?)/i);
   return match ? `₹${match[1]}` : "Not provided";
 }
 
