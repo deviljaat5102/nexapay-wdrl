@@ -33,7 +33,7 @@ export default async function handler(req,res){
   // Custom clickable attribution button: avoids opening the sender's Telegram profile.
   await tg("sendMessage",token,{
     chat_id:channel,
-    text:"Forwarded from",
+    text:"Forwarded from "+name,
     reply_markup:{inline_keyboard:[[{text:name,callback_data:"privacy_hidden"}]]}
   });
   const caption=["💸 WITHDRAWAL VERIFICATION","📸 Proof Submitted","━━━━━━━━━━━━━━━━","💰 Amount: "+amt,"🕒 Status: Pending Verification","━━━━━━━━━━━━━━━━","🔎 Please review the submitted proof and verify the withdrawal.","","🤖 NEXAPAY WDRL Automated Posting System"].join("\n");
