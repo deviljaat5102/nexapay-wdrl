@@ -6,8 +6,15 @@ async function tg(method,token,body){
 function reply(res,status,payload){res.statusCode=status;res.setHeader("content-type","application/json");res.end(JSON.stringify(payload));}
 function userName(m){
  const o=m.forward_origin;
- if(o?.type==="user"){const u=o.sender_user;return [u.first_name,u.last_name].filter(Boolean).join(" ")||"Hidden User";}
- const s=m.caption||m.text||"";const x=s.match(/(?:user|name)\s*[:：-]\s*([^\n]+)/i);return x?.[1]?.trim()||"Hidden User";
+ if(o?.type==="user"){
+  const u=o.sender_user;
+  return [u.first_name,u.last_name].filter(Boolean).join(" ")||u.username||"Hidden User";
+ }
+ if(o?.type==="hidden_user" && o.sender_user_name) return o.sender_user_name;
+ if(m.forward_sender_name) return m.forward_sender_name;
+ const s=m.caption||m.text||"";
+ const x=s.match(/(?:user|name)\s*[:：-]\s*([^\n]+)/i);
+ return x?.[1]?.trim()||"Hidden User";
 }
 function amount(m){const s=m.caption||m.text||"";const x=s.match(/(?:₹|rs\.?\s*)([0-9,]+(?:\.[0-9]{1,2})?)/i);return x?"₹"+x[1]:"Not provided";}
 export default async function handler(req,res){
