@@ -32,7 +32,22 @@ export default async function handler(req,res){
   const name=userName(m),amt=amount(m);
   // Plain text attribution above the proof: visible sender name, no profile link or user ID.
   await tg("sendMessage",token,{chat_id:channel,text:"Forwarded from "+name});
-  const caption=["💸 WITHDRAWAL VERIFICATION","📸 Proof Submitted","━━━━━━━━━━━━━━━━","💰 Amount: "+amt,"🕒 Status: Pending Verification","━━━━━━━━━━━━━━━━","🔎 Please review the submitted proof and verify the withdrawal.","","🤖 NEXAPAY WDRL Automated Posting System"].join("\n");
+  const caption=[
+    "🛡️ NEXAPAY | WITHDRAWAL DESK",
+    "━━━━━━━━━━━━━━━━━━",
+    "✅ PROOF RECEIVED",
+    "📋 Withdrawal verification request",
+    "",
+    "💰 Amount: "+amt,
+    "⏳ Status: PENDING VERIFICATION",
+    "",
+    "🔎 Our team will review the submitted proof.",
+    "Please wait for confirmation before considering",
+    "this withdrawal verified.",
+    "━━━━━━━━━━━━━━━━━━",
+    "🔐 Secure • Transparent • Trusted",
+    "🤖 NEXAPAY Automated System"
+  ].join("\n");
   await tg("sendPhoto",token,{chat_id:channel,photo:photo.file_id,caption});
   await tg("sendMessage",token,{chat_id:m.chat.id,text:"✅ Screenshot posted to the channel for admin review."});
   return reply(res,200,{ok:true});
