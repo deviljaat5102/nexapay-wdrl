@@ -28,22 +28,22 @@ function extractAmount(message) {
   return match ? `₹${match[1]}` : "Not provided";
 }
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).send("Method Not Allowed");
+export default async function handler(req) {
+  if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
   const token = process.env.BOT_TOKEN;
   const channelId = process.env.CHANNEL_ID;
   const secret = process.env.WEBHOOK_SECRET;
 
   if (!token || !channelId || !secret) {
-    return res.status(500).send("Bot environment variables are not configured");
+    return new Response("Bot environment variables are not configured", { status: 500 });
   }
-  if (req.headers["x-telegram-bot-api-secret-token"] !== secret) {
-    return res.status(401).send("Unauthorized");
+  if (req.headers.get("x-telegram-bot-api-secret-token") !== secret) {
+    return new Response("Unauthorized", { status: 401 });
   }
 
   try {
-    const update = req.body || {};
+    const update = await req.json();
 
     if (update.callback_query) {
       const query = update.callback_query;
@@ -54,7 +54,7 @@ export default async function handler(req, res) {
           show_alert: true
         });
       }
-      return res.status(200).json({ ok: true });
+      return Response.json({ ok: true });
     }
 
     const message = update.message;
@@ -113,6 +113,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("Webhook error:", error);
-    return res.status(500).json({ ok: false });
+    return Response.json({ ok: false }, { status: 500 });
   }
 }
