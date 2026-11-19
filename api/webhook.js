@@ -29,15 +29,11 @@ export default async function handler(req,res){
   if(m.chat?.type==="private"&&m.text?.startsWith("/start")){await tg("sendMessage",token,{chat_id:m.chat.id,text:"Welcome to NEXAPAY WDRL. Forward a withdrawal screenshot here for admin review."});return reply(res,200,{ok:true});}
   const photo=m.photo?.at(-1);
   if(m.chat?.type!=="private"||!photo){if(m.chat?.type==="private")await tg("sendMessage",token,{chat_id:m.chat.id,text:"Please forward a message containing a withdrawal screenshot."});return reply(res,200,{ok:true});}
-  const amt=amount(m);
-  // Preserve Telegram's native forwarded header and the sender's own forwarding-privacy setting.
-  await tg("forwardMessage",token,{
-    chat_id:channel,
-    from_chat_id:m.chat.id,
-    message_id:m.message_id
-  });
+  const name=userName(m),amt=amount(m);
+  // Post the sender name as ordinary text (not Telegram's clickable native forward attribution).
+  await tg("sendMessage",token,{chat_id:channel,text:"Forwarded from "+name});
   const caption=["💸 WITHDRAWAL VERIFICATION","📸 Proof Submitted","━━━━━━━━━━━━━━━━","💰 Amount: "+amt,"🕒 Status: Pending Verification","━━━━━━━━━━━━━━━━","🔎 Please review the submitted proof and verify the withdrawal.","","🤖 NEXAPAY WDRL Automated Posting System"].join("\n");
-  await tg("sendMessage",token,{chat_id:channel,text:caption});
+  await tg("sendPhoto",token,{chat_id:channel,photo:photo.file_id,caption});
   await tg("sendMessage",token,{chat_id:m.chat.id,text:"✅ Screenshot posted to the channel for admin review."});
   return reply(res,200,{ok:true});
  }catch(e){console.error("Webhook error:",e);return reply(res,500,{ok:false});}
