@@ -1,13 +1,13 @@
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ ok: false, error: "POST required" });
+export default async function handler(req) {
+  if (req.method !== "POST") return Response.json({ ok: false, error: "POST required" }, { status: 405 });
 
   const token = process.env.BOT_TOKEN;
   const secret = process.env.WEBHOOK_SECRET;
-  if (!token || !secret) return res.status(500).json({ ok: false, error: "BOT_TOKEN or WEBHOOK_SECRET is missing" });
-  if (req.headers["x-setup-secret"] !== secret) return res.status(401).json({ ok: false, error: "Invalid setup secret" });
+  if (!token || !secret) return Response.json({ ok: false, error: "BOT_TOKEN or WEBHOOK_SECRET is missing" }, { status: 500 });
+  if (req.headers.get("x-setup-secret") !== secret) return Response.json({ ok: false, error: "Secret did not match Vercel WEBHOOK_SECRET" }, { status: 401 });
 
-  const host = req.headers.host;
-  if (!host) return res.status(400).json({ ok: false, error: "Missing host" });
+  const host = req.headers.get("host");
+  if (!host) return Response.json({ ok: false, error: "Missing host" }, { status: 400 });
   const webhookUrl = `https://${host}/telegram-webhook`;
 
   const response = await fetch(`https://api.telegram.org/bot${token}/setWebhook`, {
@@ -20,6 +20,6 @@ export default async function handler(req, res) {
     })
   });
   const result = await response.json();
-  if (!result.ok) return res.status(502).json({ ok: false, error: result.description || "Telegram rejected webhook setup" });
-  return res.status(200).json({ ok: true, webhook: webhookUrl, telegram: result.description });
+  if (!result.ok) return Response.json({ ok: false, error: result.description || "Telegram rejected webhook setup" }, { status: 502 });
+  return Response.json({ ok: true, webhook: webhookUrl, telegram: result.description });
 }
