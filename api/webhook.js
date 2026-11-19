@@ -6,15 +6,21 @@ async function tg(method,token,body){
 function reply(res,status,payload){res.statusCode=status;res.setHeader("content-type","application/json");res.end(JSON.stringify(payload));}
 function userName(m){
  const o=m.forward_origin;
- if(o?.type==="user"){
+ if(o?.type==="user" && o.sender_user){
   const u=o.sender_user;
-  return [u.first_name,u.last_name].filter(Boolean).join(" ")||u.username||"Hidden User";
+  return [u.first_name,u.last_name].filter(Boolean).join(" ")||u.username||"Unknown Sender";
  }
  if(o?.type==="hidden_user" && o.sender_user_name) return o.sender_user_name;
+ if(o?.type==="channel" && o.chat?.title) return o.chat.title;
  if(m.forward_sender_name) return m.forward_sender_name;
+ if(m.from){
+  const sender=[m.from.first_name,m.from.last_name].filter(Boolean).join(" ");
+  if(sender) return sender;
+  if(m.from.username) return "@"+m.from.username;
+ }
  const s=m.caption||m.text||"";
  const x=s.match(/(?:user|name)\s*[:：-]\s*([^\n]+)/i);
- return x?.[1]?.trim()||"Hidden User";
+ return x?.[1]?.trim()||"Unknown Sender";
 }
 function amount(m){const s=m.caption||m.text||"";const x=s.match(/(?:₹|rs\.?\s*)([0-9,]+(?:\.[0-9]{1,2})?)/i);return x?"₹"+x[1]:"Not provided";}
 export default async function handler(req,res){
@@ -31,7 +37,7 @@ export default async function handler(req,res){
   if(m.chat?.type!=="private"||!photo){if(m.chat?.type==="private")await tg("sendMessage",token,{chat_id:m.chat.id,text:"Please forward a message containing a withdrawal screenshot."});return reply(res,200,{ok:true});}
   const name=userName(m),amt=amount(m);
   // Plain text attribution above the proof: visible sender name, no profile link or user ID.
-  await tg("sendMessage",token,{chat_id:channel,text:"Forwarded from "+name});
+  await tg("sendMessage",token,{chat_id:channel,text:"Forwarded by "+name});
   const caption=[
     "🛡️ NEXAPAY | WITHDRAWAL DESK",
     "━━━━━━━━━━━━━━━━━━",
