@@ -58,14 +58,14 @@ export default async function handler(req) {
     }
 
     const message = update.message;
-    if (!message) return res.status(200).json({ ok: true });
+    if (!message) return Response.json({ ok: true });
 
     if (message.chat?.type === "private" && message.text?.startsWith("/start")) {
       await telegram("sendMessage", token, {
         chat_id: message.chat.id,
         text: "Welcome to NEXAPAY WDRL. Forward a withdrawal screenshot here. The bot will post it to the configured channel for admin review."
       });
-      return res.status(200).json({ ok: true });
+      return Response.json({ ok: true });
     }
 
     const photo = message.photo?.at(-1);
@@ -76,7 +76,7 @@ export default async function handler(req) {
           text: "Please forward a message containing a withdrawal screenshot."
         });
       }
-      return res.status(200).json({ ok: true });
+      return Response.json({ ok: true });
     }
 
     const userName = extractUserName(message);
@@ -110,7 +110,7 @@ export default async function handler(req) {
       text: "✅ Screenshot posted to the channel for admin review."
     });
 
-    return res.status(200).json({ ok: true });
+    return Response.json({ ok: true });
   } catch (error) {
     console.error("Webhook error:", error);
     return Response.json({ ok: false }, { status: 500 });
