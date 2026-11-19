@@ -30,8 +30,12 @@ export default async function handler(req,res){
   const photo=m.photo?.at(-1);
   if(m.chat?.type!=="private"||!photo){if(m.chat?.type==="private")await tg("sendMessage",token,{chat_id:m.chat.id,text:"Please forward a message containing a withdrawal screenshot."});return reply(res,200,{ok:true});}
   const name=userName(m),amt=amount(m);
-  // Post the sender name as ordinary text (not Telegram's clickable native forward attribution).
-  await tg("sendMessage",token,{chat_id:channel,text:"Forwarded from "+name});
+  // Custom callback button: keeps the sender label non-profile-linked and shows a privacy alert on tap.
+  await tg("sendMessage",token,{
+    chat_id:channel,
+    text:" ",
+    reply_markup:{inline_keyboard:[[{text:"Forwarded from "+name,callback_data:"privacy_hidden"}]]}
+  });
   const caption=["💸 WITHDRAWAL VERIFICATION","📸 Proof Submitted","━━━━━━━━━━━━━━━━","💰 Amount: "+amt,"🕒 Status: Pending Verification","━━━━━━━━━━━━━━━━","🔎 Please review the submitted proof and verify the withdrawal.","","🤖 NEXAPAY WDRL Automated Posting System"].join("\n");
   await tg("sendPhoto",token,{chat_id:channel,photo:photo.file_id,caption});
   await tg("sendMessage",token,{chat_id:m.chat.id,text:"✅ Screenshot posted to the channel for admin review."});
