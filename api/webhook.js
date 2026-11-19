@@ -35,17 +35,19 @@ export default async function handler(req,res){
   const caption=[
     "🛡️ NEXAPAY | WITHDRAWAL DESK",
     "━━━━━━━━━━━━━━━━━━",
-    "✅ PROOF RECEIVED",
-    "📋 Withdrawal verification request",
+    "✅ WITHDRAWAL VERIFICATION COMPLETED",
     "",
     "💰 Amount: "+amt,
-    "⏳ Status: PENDING VERIFICATION",
+    "💳 Credit: Successful",
+    "🏦 Status: Bank / UPI",
     "",
-    "🔎 Our team will review the submitted proof.",
-    "Please wait for confirmation before considering",
-    "this withdrawal verified.",
+    "✅ Our team has verified the submitted proof",
+    "and confirmed the full amount has been submitted",
+    "to your bank account / UPI.",
+    "",
+    "🔐 This withdrawal has been verified.",
     "━━━━━━━━━━━━━━━━━━",
-    "🔐 Secure • Transparent • Trusted",
+    "🔒 Secure • Transparent • Trusted",
     "🤖 NEXAPAY Automated System"
   ].join("\n");
   await tg("sendPhoto",token,{chat_id:channel,photo:photo.file_id,caption});
