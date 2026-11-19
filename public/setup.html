@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXAPAY WDRL Setup</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#f3f5f8;margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;box-sizing:border-box}
+main{background:#fff;max-width:420px;width:100%;padding:24px;border-radius:18px;box-shadow:0 8px 30px #17203318;box-sizing:border-box}
+h1{font-size:23px;margin:0 0 8px}p{color:#596273;line-height:1.5}
+input,button{width:100%;box-sizing:border-box;padding:14px;border-radius:10px;font-size:16px}
+input{border:1px solid #cbd2dc;margin:10px 0 14px}button{border:0;background:#1769e0;color:white;font-weight:700}
+#result{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:14px;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>NEXAPAY WDRL</h1>
+<p>Enter the WEBHOOK_SECRET value saved in Vercel. This registers the Telegram webhook; it does not display or ask for your bot token.</p>
+<form id="setup">
+<label for="secret">WEBHOOK_SECRET</label>
+<input id="secret" type="password" autocomplete="off" required>
+<button type="submit">Connect Telegram Webhook</button>
+</form>
+<div id="result" role="status"></div>
+</main>
+<script>
+document.getElementById("setup").addEventListener("submit", async function(event){
+ event.preventDefault();
+ const result=document.getElementById("result");
+ result.textContent="Connecting…";
+ try{
+  const response=await fetch("/api/setup",{method:"POST",headers:{"x-setup-secret":document.getElementById("secret").value}});
+  const data=await response.json();
+  result.textContent=data.ok ? "✅ "+data.telegram+"\nWebhook: "+data.webhook : "❌ "+(data.error||"Setup failed");
+ }catch(e){result.textContent="❌ Connection failed. Please try again.";}
+});
+</script>
+</body>
+</html>
